@@ -21,23 +21,32 @@ b = st.sidebar.number_input("Width (mm)", value=120)
 d = st.sidebar.number_input("Effective depth (mm)", value=435)
 h = st.sidebar.number_input("Height (mm)", value=500)
 
-Mphi = sf.momentcurvatureSFRC(fc,daggmax, fy, As, rhof, Vf, df, lf, b, h, d)
+tab1, tab2, tab3, tab4 = st.tabs(["Moment-Curvature", "Beam Analysis", "Moment Check", "Shear Check"])
 
-fig = go.Figure(data=[go.Scatter(x=[0,Mphi[1][0],Mphi[1][1], Mphi[1][2] ], y=[0, Mphi[0][0], Mphi[0][1], Mphi[0][2]])])
-fig.data[0].marker.color = 'Red'
-fig.layout.title.text = "Moment-curvature diagram of SFRC-RC beam"
-fig.layout.width = 900
-fig.layout.height = 600
-fig.layout.xaxis.title = "Curvature (-)"
-fig.layout.yaxis.title = "Bending moment (kNm)"
-fig.update_xaxes(zeroline=True, zerolinewidth=2, zerolinecolor='LightGray', range=[0, None])
-fig.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor='LightGray', range=[0, None])
-fig.update_layout(
-    plot_bgcolor='white',
-    xaxis_showgrid=True, xaxis_gridcolor='rgb(245, 245, 245)',
-    yaxis_showgrid=True, yaxis_gridcolor='rgb(245, 245, 245)')
+with tab1:
+    Mphi = sf.momentcurvatureSFRC(fc,daggmax, fy, As, rhof, Vf, df, lf, b, h, d)
 
-st.plotly_chart(fig)
+    st.subheader("Results of calculation")
+    st.write(f"The cracking moment is {Mphi[0][0]:.2f} kNm and the curvature at cracking is {Mphi[1][0]:.3e}.")
+    st.write(f"The yield moment is {Mphi[0][1]:.2f} kNm the curvature at yielding is {Mphi[1][1]:.3e}.")
+    st.write(f"The ultimate moment is {Mphi[0][2]:.2f} kNm the curvature at ultimate is {Mphi[1][2]:.3e}.")
+
+    st.subheader("Moment-curvature plot")
+    fig = go.Figure(data=[go.Scatter(x=[0,Mphi[1][0],Mphi[1][1], Mphi[1][2] ], y=[0, Mphi[0][0], Mphi[0][1], Mphi[0][2]])])
+    fig.data[0].marker.color = 'Red'
+    fig.layout.title.text = "Moment-curvature diagram of SFRC-RC beam"
+    fig.layout.width = 900
+    fig.layout.height = 600
+    fig.layout.xaxis.title = "Curvature (-)"
+    fig.layout.yaxis.title = "Bending moment (kNm)"
+    fig.update_xaxes(zeroline=True, zerolinewidth=2, zerolinecolor='LightGray', range=[0, None])
+    fig.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor='LightGray', range=[0, None])
+    fig.update_layout(
+        plot_bgcolor='white',
+        xaxis_showgrid=True, xaxis_gridcolor='rgb(245, 245, 245)',
+        yaxis_showgrid=True, yaxis_gridcolor='rgb(245, 245, 245)')
+
+    st.plotly_chart(fig)
 
 
 
