@@ -1,17 +1,22 @@
 import streamlit as st
 import SFRC as sf
+import plotly.graph_objects as go
+
 
 st.header("Moment-curvature diagram of a SFRC-RC rectangular cross-section")
 
-st.sidebar.subheader("Input Parameters")
+st.sidebar.subheader("Concrete Materials Parameters")
 fc = st.sidebar.number_input("Concrete cylinder compressive strenght (MPa)", value=25)
 daggmax = st.sidebar.number_input("Maximum aggregate size (mm)", value=16)
+st.sidebar.subheader("Steel Reinforcement Parameters")
 fy = st.sidebar.number_input("Yield strenght of mild steel (MPa)", value=400)
 As = st.sidebar.number_input("Area of tensile reinforcement (mm2)", value=200)
+st.sidebar.subheader("Steel fiber properties")
 rhof = st.sidebar.number_input("Fiber bond factor (-)", value=1)
 Vf = st.sidebar.number_input("Fiber volume fraction (-)", value=0.0075)
 df = st.sidebar.number_input("Fiber diameter (mm)", value=0.55)
 lf = st.sidebar.number_input("Fiber length (mm)", value=35)
+st.sidebar.subheader("Geometry input")
 b = st.sidebar.number_input("Width (mm)", value=120)
 d = st.sidebar.number_input("Effective depth (mm)", value=435)
 h = st.sidebar.number_input("Height (mm)", value=500)
@@ -31,7 +36,6 @@ fig.update_layout(
     plot_bgcolor='white',
     xaxis_showgrid=True, xaxis_gridcolor='rgb(245, 245, 245)',
     yaxis_showgrid=True, yaxis_gridcolor='rgb(245, 245, 245)')
-
 
 st.plotly_chart(fig)
 
