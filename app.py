@@ -5,7 +5,7 @@ import math
 from eng_module import beams
 
 
-st.header("Moment-curvature diagram of a SFRC-RC rectangular cross-section")
+st.header("Design checks of a simply supported SFRC-RC beam")
 
 st.sidebar.subheader("Concrete Materials Parameters")
 fc = st.sidebar.number_input("Concrete cylinder compressive strenght (MPa)", value=25)
@@ -13,6 +13,9 @@ daggmax = st.sidebar.number_input("Maximum aggregate size (mm)", value=16)
 st.sidebar.subheader("Steel Reinforcement Parameters")
 fy = st.sidebar.number_input("Yield strenght of mild steel (MPa)", value=400)
 As = st.sidebar.number_input("Area of tensile reinforcement (mm2)", value=200)
+phibar = st.sidebar.number_input("Reinforcement bar diameter (mm)", value=12)
+ns = st.sidebar.number_input("Number of reinforcement bars (-)", value=2)
+
 st.sidebar.subheader("Steel fiber properties")
 rhof = st.sidebar.number_input("Fiber bond factor (-)", value=1)
 Vf = st.sidebar.number_input("Fiber volume fraction (-)", value=0.0075)
@@ -58,6 +61,10 @@ with tab1:
 
     st.plotly_chart(fig)
 
+    st.subheader("References")
+    st.write("Mobasher, B., Y. Yao and C. Soranakom (2015). Analytical solutions for flexural design of hybrid steel fiber reinforced concrete beams. Engineering Structures 100: 164-177.")
+    st.write("RILEM TC 162-TDF (2003). σ-ε-Design Method.")
+
 with tab2:
     E = 57000/12*math.sqrt(fc)
     Iz = b*h**3/12
@@ -94,11 +101,13 @@ with tab2:
     beam_model.Members['SFRC-RC beam'].plot_moment(Direction="Mz", combo_name="Live", n_points=100)
 
     shearres = beams.extract_arrays_all_combos(beam_model, "shear", "Fy", 300)
-    shearfactored = dfactor*shearres["Dead"][0][1] + lfactor*shearres["Live"][0][1]
+    shearfactored = 1/1000*dfactor*shearres["Dead"][0][1] + lfactor*shearres["Live"][0][1]
+    designshear = max(abs(shearfactored))
     xes = shearres[list(shearres.keys())[0]]
     x_values = xes[0][0]
     momentres = beams.extract_arrays_all_combos(beam_model, "moment", "Mz", 300)
-    momentfactored = dfactor*momentres["Dead"][0][1] + lfactor*momentres["Live"][0][1]
+    momentfactored = 1/1000*(1/1000*dfactor*momentres["Dead"][0][1] + lfactor*momentres["Live"][0][1])
+    designmoment = max(abs(momentfactored))
 
     st.subheader("Factored shear diagram")
     fig = go.Figure(data=[go.Scatter(x=x_values, y=shearfactored)])
@@ -134,5 +143,27 @@ with tab2:
 
     st.plotly_chart(fig)
 
+    st.write("These graphs are built with PyNite.")
+
                        
-                   
+    with tab3:   
+        st.subheader("Results of Bending Moment Check")
+        if designmoment <= Mphi[0][2]:
+            st.write(f"The ultimate moment is {Mphi[0][2]:.2f} kNm and the factored moment demand is {designmoment:.2f} kNm.")
+            st.write("The demand is less than or equal to the capacity. The beam fulfills the requirements for flexure.")
+        elif designmoment > Mphi[0][2]:
+            st.write(f"The ultimate moment is {Mphi[0][2]:.2f} kNm and the factored moment demand is {designmoment:.2f} kNm.")
+            st.write("The demand is larger than the capacity. The beam does not fulfill the requirements for flexure.")
+        else:
+            st.write("Sorry, something has gone wrong here!")
+
+
+        #st.write(f"The design shear is {designshear} kN")
+
+
+
+
+
+
+
+

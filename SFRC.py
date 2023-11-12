@@ -139,4 +139,77 @@ def momentcurvatureSFRC (fc: float, daggmax: float,
         k3u=k31
         phiult = phi31*phicr
 
-    return [[Mcr, My, Mult],[phicr, phiy, phiult]]
+    return [[Mcr, My, Mult],[phicr, phiy, phiult],[lambdar1, om],[k1, k2y, k3u]]
+
+def CSDTShear (fc: float, daggmax: float, 
+                fy: int, As: int, phibar: int, ns: int, 
+                rhof: float, Vf: float, df: float, lf: float,
+                b: int, d: int, h: int
+                V: float, M: float) -> list:
+    """
+    This function uses the Critical Shear Displacement Theory, modified for SFRC to determine the
+    shear capacity, as well as the contributions of dowel action, the uncracked compression zone, 
+    aggregate interlock, and the steel fibers.
+    The full theoretical basis of this approach is given in 
+    Lantsoght, E. O. L. (2023). "Theoretical model of shear capacity of steel fiber reinforced concrete beams." 
+    Engineering Structures 280: 115722.
+    """
+
+    #contribution of dowel action
+    bn=b-ns*phibar
+    if bn <= 0:
+        bn=b-ns/2*phibar
+    else:
+        bn = bn
+
+    Vd=1.64*bn*phibar*fc**(1/3)*1/1000 #in kN
+
+    # aspects of sectional analysis
+    Mphi = momentcurvatureSFRC (fc, daggmax, fy, As, rhof, Vf, df, lf, b, d, h) 
+    Mcr = Mphi[0][0]
+    My = Mphi[0][1]
+    Mult = Mphi[0][2]
+    k1 = Mphi[3][0]
+    k2y = Mphi[3][1]
+    k3u = Mphi[3][2]
+    lambdar1 = Mphi[2][0]
+    om = Mphi[2][1]
+  
+    if M <= Mcr:
+        kcsm=k1
+        lambdaM= M/Mcr*lambdar1
+    elif M <= My:
+        kcsm=(k2y-k1)/(My-Mcr)*(M-Mcr)+k1
+        lambdaM=(om-lambdar1)/(My-Mcr)*(M-Mcr)+lambdar1
+    else:
+        kcsm=(k3u-k2y)/(Mult-My)*(M-My)+k2y
+        lambdaM=(lambdar1-om)/(My-Mult)*(M-My)+om
+
+    zc=kcsm*h
+    z=d-1/3*zc
+
+    #contribution of concrete in compression zone
+    Vc=2/3*zc/z*V
+
+    #contribution from aggregate interlock
+    D=min(25*d/(30610*phibar)+0.0022,0.025) #mm
+    sb=min(15*phibar,0.5*math.sqrt(math.pi*phibar)**2/rho)
+    kf=max(lf/(50*df),1)
+    smi=rho/phibar+kf*0.5*Vf/df
+    kc3=1-min(Vf,0.015)/0.015*(1-1/kf)
+    sm=2*(1.5*daggmax+sb/10)*kc3+0.4*0.125/smi
+    etavg=(h-zc)/(2*zc)*lambdaM*ecr
+    wb=sm*etavg*(1.7+3.4*Vf*lf/df)
+    Vai=max(fc,60)**0.56*sm*b*0.03/(wb-0.01)*(-978*D**2+85*D-0.27)*1/1000 
+
+    #contribution of the fibers
+    tau=0.85*math.sqrt(fc)
+    f=tau*math.pi*rhof*df*lf/4
+    rf=df/2
+    N=0.5*Vf/(math.pi*rf**2)
+    sigmafu=N*f
+    VF=0.41*0.68*math.sqrt(fc)*min(1,F)*b*(d-zc)*1/1000
+
+    VCSDT=Vc+VF+Vai+Vd
+
+    return [VCSDT, Vd, Vc, Vai, VF]
