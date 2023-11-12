@@ -177,8 +177,8 @@ def shearcap (fc: float, daggmax: float,
     k3u = Mphi[3][2]
     lambdar1 = Mphi[2][0]
     om = Mphi[2][1]
-    ecr = Mphi[4]
-  
+    ecr = Mphi[4][0]
+      
     if M <= Mcr:
         kcsm=k1
         lambdaM= M/Mcr*lambdar1
@@ -202,7 +202,7 @@ def shearcap (fc: float, daggmax: float,
     smi=rho/phibar+kf*0.5*Vf/df
     kc3=1-min(Vf,0.015)/0.015*(1-1/kf)
     sm=2*(1.5*daggmax+sb/10)*kc3+0.4*0.125/smi
-    etavg=(h-zc)/(2*zc)*lambdaM*ecr
+    etavg=((h-zc)/(2*zc))*lambdaM*ecr
     wb=sm*etavg*(1.7+3.4*Vf*lf/df)
     Vai=max(fc,60)**0.56*sm*b*0.03/(wb-0.01)*(-978*D**2+85*D-0.27)*1/1000 
 
