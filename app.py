@@ -1,6 +1,8 @@
 import streamlit as st
 import SFRC as sf
 import plotly.graph_objects as go
+import math
+from eng_module import beams
 
 
 st.header("Moment-curvature diagram of a SFRC-RC rectangular cross-section")
@@ -20,6 +22,14 @@ st.sidebar.subheader("Geometry input")
 b = st.sidebar.number_input("Width (mm)", value=120)
 d = st.sidebar.number_input("Effective depth (mm)", value=435)
 h = st.sidebar.number_input("Height (mm)", value=500)
+l = st.sidebar.number_input("Length (mm)", value=2000)
+sup1 = st.sidebar.number_input("Support 1 (mm)", value=10)
+sup2 = st.sidebar.number_input("Support 2 (mm)", value=1500)
+st.sidebar.subheader("Loading input")
+load = st.sidebar.number_input("Load (kN)", value=100)
+loadloc = st.sidebar.number_input("Position of load (mm)", value=400)
+dfactor = st.sidebar.number_input("Dead load factor", value=1.2)
+lfactor = st.sidebar.number_input("Live load factor", value=1.6)
 
 tab1, tab2, tab3, tab4 = st.tabs(["Moment-Curvature", "Beam Analysis", "Moment Check", "Shear Check"])
 
@@ -48,8 +58,81 @@ with tab1:
 
     st.plotly_chart(fig)
 
+with tab2:
+    E = 57000/12*math.sqrt(fc)
+    Iz = b*h**3/12
+    selfweight = 25*b/1000*h/1000
+    beam_dict = {'Name': 'SFRC-RC beam',
+    'L': l,
+    'E': E,
+    'Iz': Iz,
+    'Iy': 1.0,
+    'A': b*h,
+    'J': 1,
+    'nu': 1,
+    'rho': 25,
+    'Supports': {sup1: 'P', sup2: 'R'},
+    'Loads': [{'Type': 'Point',
+    'Direction': 'Fy',
+    'Magnitude': -load,
+    'Location': loadloc,
+    'Case': 'Live'}, {'Type': 'Dist',
+    'Direction': 'Fy',
+    'Start Magnitude': -selfweight,
+    'End Magnitude': -selfweight,
+    'Start Location': 0.0,
+    'End Location': l,
+    'Case': 'Dead'},
+    ]}
 
+    beam_model = beams.build_beam(beam_dict)
+    beam_model.analyze(check_statics=True)   
 
+    beam_model.Members['SFRC-RC beam'].plot_shear(Direction="Fy", combo_name="Dead", n_points=100)
+    beam_model.Members['SFRC-RC beam'].plot_moment(Direction="Mz", combo_name="Dead", n_points=100)
+    beam_model.Members['SFRC-RC beam'].plot_shear(Direction="Fy", combo_name="Live", n_points=100)
+    beam_model.Members['SFRC-RC beam'].plot_moment(Direction="Mz", combo_name="Live", n_points=100)
+
+    shearres = beams.extract_arrays_all_combos(beam_model, "shear", "Fy", 300)
+    shearfactored = dfactor*shearres["Dead"][0][1] + lfactor*shearres["Live"][0][1]
+    xes = shearres[list(shearres.keys())[0]]
+    x_values = xes[0][0]
+    momentres = beams.extract_arrays_all_combos(beam_model, "moment", "Mz", 300)
+    momentfactored = dfactor*momentres["Dead"][0][1] + lfactor*momentres["Live"][0][1]
+
+    st.subheader("Factored shear diagram")
+    fig = go.Figure(data=[go.Scatter(x=x_values, y=shearfactored)])
+    fig.data[0].marker.color = 'Red'
+    fig.layout.title.text = "Shear diagram of SFRC-RC beam"
+    fig.layout.width = 900
+    fig.layout.height = 600
+    fig.layout.xaxis.title = "x (mm)"
+    fig.layout.yaxis.title = "Shear (kN)"
+    fig.update_xaxes(zeroline=True, zerolinewidth=2, zerolinecolor='LightGray', range=[0, None])
+    fig.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor='LightGray', range=[0, None])
+    fig.update_layout(
+        plot_bgcolor='white',
+        xaxis_showgrid=True, xaxis_gridcolor='rgb(245, 245, 245)',
+        yaxis_showgrid=True, yaxis_gridcolor='rgb(245, 245, 245)')
+
+    st.plotly_chart(fig)
+
+    st.subheader("Factored moment diagram")
+    fig = go.Figure(data=[go.Scatter(x=x_values, y=momentfactored)])
+    fig.data[0].marker.color = 'Red'
+    fig.layout.title.text = "Moment diagram of SFRC-RC beam"
+    fig.layout.width = 900
+    fig.layout.height = 600
+    fig.layout.xaxis.title = "x (mm)"
+    fig.layout.yaxis.title = "Moment (kNm)"
+    fig.update_xaxes(zeroline=True, zerolinewidth=2, zerolinecolor='LightGray', range=[0, None])
+    fig.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor='LightGray', range=[0, None])
+    fig.update_layout(
+        plot_bgcolor='white',
+        xaxis_showgrid=True, xaxis_gridcolor='rgb(245, 245, 245)',
+        yaxis_showgrid=True, yaxis_gridcolor='rgb(245, 245, 245)')
+
+    st.plotly_chart(fig)
 
                        
                    
