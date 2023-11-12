@@ -9,10 +9,10 @@ from eng_module import beams
 st.header("Design checks of a simply supported SFRC-RC beam")
 
 st.sidebar.subheader("Concrete Materials Parameters")
-fc = st.sidebar.number_input("Concrete cylinder compressive strenght (MPa)", value=28)
+fc = st.sidebar.number_input("Concrete cylinder compressive strength (MPa)", value=28)
 daggmax = st.sidebar.number_input("Maximum aggregate size (mm)", value=16)
 st.sidebar.subheader("Steel Reinforcement Parameters")
-fy = st.sidebar.number_input("Yield strenght of mild steel (MPa)", value=400)
+fy = st.sidebar.number_input("Yield strength of mild steel (MPa)", value=400)
 As = st.sidebar.number_input("Area of tensile reinforcement (mm2)", value=226)
 phibar = st.sidebar.number_input("Reinforcement bar diameter (mm)", value=12)
 ns = st.sidebar.number_input("Number of reinforcement bars (-)", value=2)
@@ -144,7 +144,7 @@ with tab2:
 
     st.plotly_chart(fig)
 
-    st.write("These graphs are built with PyNite.")
+    st.write("This structural analysis is done with PyNite.")
 
                        
     with tab3:   
