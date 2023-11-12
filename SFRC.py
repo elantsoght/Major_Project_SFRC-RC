@@ -139,13 +139,14 @@ def momentcurvatureSFRC (fc: float, daggmax: float,
         k3u=k31
         phiult = phi31*phicr
 
-    return [[Mcr, My, Mult],[phicr, phiy, phiult],[lambdar1, om],[k1, k2y, k3u]]
+    return [[Mcr, My, Mult],[phicr, phiy, phiult],[lambdar1, om],[k1, k2y, k3u], [ecr]]
 
-def CSDTShear (fc: float, daggmax: float, 
-                fy: int, As: int, phibar: int, ns: int, 
-                rhof: float, Vf: float, df: float, lf: float,
-                b: int, d: int, h: int
-                V: float, M: float) -> list:
+
+def shearcap (fc: float, daggmax: float, 
+               fy: int, As: int, phibar: int, ns: int, 
+               rhof: float, Vf: float, df: float, lf: float, 
+               b: int, d: int, h: int, 
+               V: float, M: float) -> list:
     """
     This function uses the Critical Shear Displacement Theory, modified for SFRC to determine the
     shear capacity, as well as the contributions of dowel action, the uncracked compression zone, 
@@ -154,7 +155,9 @@ def CSDTShear (fc: float, daggmax: float,
     Lantsoght, E. O. L. (2023). "Theoretical model of shear capacity of steel fiber reinforced concrete beams." 
     Engineering Structures 280: 115722.
     """
-
+    rho=As/(b*d)
+    F = Vf*lf/df*rhof
+    
     #contribution of dowel action
     bn=b-ns*phibar
     if bn <= 0:
@@ -174,6 +177,7 @@ def CSDTShear (fc: float, daggmax: float,
     k3u = Mphi[3][2]
     lambdar1 = Mphi[2][0]
     om = Mphi[2][1]
+    ecr = Mphi[4]
   
     if M <= Mcr:
         kcsm=k1
