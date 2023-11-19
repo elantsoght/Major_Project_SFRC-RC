@@ -1,0 +1,16 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "SFRC-RC"
+authors = [{name = "Eva Lantsoght", email = "eva.lantsoght@gmail.com"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = ["License :: OSI Approved :: Apache Software License"]
+dynamic = ["version", "description"]
+dependencies = ["numpy", "pandas", "math", "PyNite", "typing", "streamlit", "plotly"] 
+
+[project.urls]
+Home = "https://www.evalantsoght.com"
+
