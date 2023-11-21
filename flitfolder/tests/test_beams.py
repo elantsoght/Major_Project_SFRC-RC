@@ -1,4 +1,4 @@
-import beams
+from SFRC.eng_module import beams
 import math
 
 
