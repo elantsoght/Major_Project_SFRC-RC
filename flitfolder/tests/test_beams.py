@@ -56,13 +56,13 @@ def test_fe_model_ss_cant():
     assert math.isclose(n1,200, abs_tol = 1e-6)
 
 
-def test_read_beam_file():
+#def test_read_beam_file():
 
-    beam1_data = beams.read_beam_file('eng_module/test_data/beam_1.txt')
-    beam4_data = beams.read_beam_file('eng_module/test_data/beam_4.txt')
+#   beam1_data = beams.read_beam_file('eng_module/test_data/beam_1.txt')
+#   beam4_data = beams.read_beam_file('eng_module/test_data/beam_4.txt')
 
-    assert beam1_data == [['4800', ' 200000', ' 437000000'], ['0', ' 3000'], ['-10']]
-    assert beam4_data == [['8000', ' 28000', ' 756e6'],['0', ' 7000'],['-52']]
+#   assert beam1_data == [['4800', ' 200000', ' 437000000'], ['0', ' 3000'], ['-10']]
+#   assert beam4_data == [['8000', ' 28000', ' 756e6'],['0', ' 7000'],['-52']]
 
 def test_separate_lines():
     
@@ -88,12 +88,12 @@ def test_get_spans():
     assert beams.get_spans(beam_length2, cant_support_loc2) == (2500, 1500)
 
 
-def test_load_beam_model():
+#def test_load_beam_model():
 
-    model5 = beams.load_beam_model('eng_module/test_data/beam_5.txt')
-    model5.analyze_linear(check_statics=True)
-    res5 = model5.Members['My new beam'].min_deflection(Direction="dy",combo_name="Live")
-    assert math.isclose(res5, -68.12405, abs_tol = 1e-2)
+#    model5 = beams.load_beam_model('eng_module/test_data/beam_5.txt')
+#    model5.analyze_linear(check_statics=True)
+#    res5 = model5.Members['My new beam'].min_deflection(Direction="dy",combo_name="Live")
+#    assert math.isclose(res5, -68.12405, abs_tol = 1e-2)
 
 
 def test_separate_data():

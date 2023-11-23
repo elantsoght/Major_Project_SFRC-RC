@@ -1,4 +1,4 @@
-import utils
+from SFRC.eng_module import utils
 
 def test_str_to_int():
     string_1 = "43"

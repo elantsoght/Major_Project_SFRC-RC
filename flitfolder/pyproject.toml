@@ -9,7 +9,7 @@ readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: Apache Software License"]
 dynamic = ["version", "description"]
-dependencies = ["numpy", "pandas", "math", "PyNite", "typing", "streamlit", "plotly", "pytest"] 
+dependencies = ["numpy", "pandas", "PyNiteFEA", "streamlit", "plotly", "pytest", "scipy"] 
 
 [project.urls]
 Home = "https://www.evalantsoght.com"

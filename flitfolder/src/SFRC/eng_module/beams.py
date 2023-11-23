@@ -1,8 +1,7 @@
 import math
 from PyNite import FEModel3D
-from eng_module import utils 
+from SFRC.eng_module import utils 
 from typing import Optional
-from eng_module import load_factors
 
 def calc_shear_modulus(nu: float, E:float)-> float:
     """
