@@ -6,8 +6,5 @@ without tirrups
 
 __version__ = "0.0.1"
 
-from .eng_module.SFRC import (
-    momentcurvatureSFRC, 
-    shearcap)
-
-from .eng_module.beams import (build_beam, extract_arrays_all_combos)
+from .eng_module.beams import build_beam, extract_arrays_all_combos
+from .eng_module.SFRC import momentcurvatureSFRC, shearcap
